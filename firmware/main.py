@@ -1,6 +1,4 @@
 import board
-
-import board
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC
 from kmk.scanners import DiodeOrientation
@@ -15,24 +13,28 @@ from kmk.extensions.media_keys import MediaKeys
 
 keyboard = KMKKeyboard()
 
-#
-# --- Hardware pin mapping ---
-#
-# Columns                : Column0, 1, 2 = GP26, GP27, GP28
-# Rows                   : Row0, 1, 2    = GP4, GP2, GP1
-# Rotary encoder A/B     : GP0, GP3
-# RGB data               : GP29
-# OLED I2C               : SDA=GP6, SCL=GP7
-
-keyboard.col_pins = (board.GP26, board.GP27, board.GP28)
-keyboard.row_pins = (board.GP4, board.GP2, board.GP1)
-
-keyboard.diode_orientation = DiodeOrientation.COL2ROW
-
+# Adding Modules and Extensions
 macros = Macros()
 keyboard.modules.append(macros)
 
+encoder_handler = EncoderHandler()
+keyboard.modules.append(encoder_handler)
+
 keyboard.extensions.append(MediaKeys())
+
+#
+# --- Hardware pin mapping ---
+#
+# Columns                : D0, D1, D2
+# Rows                   : D9, D8, D7
+# Rotary encoder A/B     : D6, D10
+# RGB data               : D3
+# OLED I2C               : SDA=D5, SCL=D4
+
+keyboard.col_pins = (board.D0, board.D1, board.D2)
+keyboard.row_pins = (board.D9, board.D8, board.D7)
+
+keyboard.diode_orientation = DiodeOrientation.COL2ROW
 
 keyboard.keymap = [
     [
@@ -42,13 +44,13 @@ keyboard.keymap = [
     ]
 ]
 
-encoder_handler = EncoderHandler()
-encoder_handler.pins = ((board.GP0, board.GP3, None, False),)
-encoder_handler.map = (
-    ((KC.VOLD, KC.VOLU, KC.NO),)
-)
 
-keyboard.modules.append(encoder_handler)
+encoder_handler.pins = ((board.D6, board.D10, None, False),)
+encoder_handler.map = [
+    [[KC.VOLD, KC.VOLU, KC.MUTE], None]
+]
 
-rgb = RGB(pixel_pin=board.GP29, num_pixels=2)
-keyboard.extensions.append(rgb)
+# rgb = RGB(pixel_pin=board.GP29, num_pixels=2)
+# keyboard.extensions.append(rgb)
+
+keyboard.go()
