@@ -1,3 +1,6 @@
+import displayio
+displayio.release_displays()
+
 import board
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.keys import KC
@@ -10,6 +13,8 @@ from kmk.modules.macros import Macros
 # Extensions
 from kmk.extensions.rgb import RGB
 from kmk.extensions.media_keys import MediaKeys
+
+import oled_screen
 
 keyboard = KMKKeyboard()
 
@@ -53,4 +58,14 @@ encoder_handler.map = [
 # rgb = RGB(pixel_pin=board.GP29, num_pixels=2)
 # keyboard.extensions.append(rgb)
 
-keyboard.go()
+try:
+    keyboard.go()
+
+except Exception as e:
+    print("Exception:", e)
+
+finally:
+    try:
+        oled_screen.clear_display()
+    except Exception:
+        pass
