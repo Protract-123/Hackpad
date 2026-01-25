@@ -1,7 +1,7 @@
 # glitchy_hackpad
 
 A macropad I made for myself, because it's fun.
-Recieves and processes data from KIN, however it can be disabled if not required.
+Recieves and processes data from [KIN](https://github.com/Protract-123/KIN), however it can be disabled if not required.
 
 * Keyboard Maintainer: [Yuvraj Verma](https://github.com/Protract-123)
 * Hardware Supported: RP2040

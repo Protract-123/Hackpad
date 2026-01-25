@@ -32,7 +32,7 @@ Here's the base and the shell of the case as individual parts.
 ## Firmware
 
 The firmware was build with KMK and Python. The screen is unimplemented as of now, but will be Soon™.
-There is now a better, alternative firmware created with QMK which also supports KIN to send information to the keyboard (Use the non-via one)
+There is now a better, alternative firmware created with QMK which also supports [KIN](https://github.com/Protract-123/KIN) to send information to the keyboard (Use the non-via one)
 
 ## Bill of Materials
 
