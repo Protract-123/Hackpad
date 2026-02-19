@@ -105,13 +105,15 @@ bool oled_task_user(void) {
 
             char buf[8];
             snprintf(buf, sizeof(buf), "VOL %3u", host_volume);
+            // printf("%s\n", buf);
+            
             render_centered_text(buf, 1);
             return false;
         }
 
         if (active_app[0] != '\0' &&
             timer_elapsed32(last_app_update) < APP_TIMEOUT) {
-
+            // printf("Active App: %s\n", active_app);
             render_centered_text(active_app, 1);
             return false;
         }
@@ -131,32 +133,51 @@ bool oled_task_user(void) {
 #ifdef RAW_ENABLE
 
 void raw_hid_receive(uint8_t *data, uint8_t length) {
-    payload_type_t type = data[0];
+    if (length < 4) {
+        return;
+    }
+
+    if (data[0] != HID_MAGIC_0 ||
+        data[1] != HID_MAGIC_1 ||
+        data[2] != HID_MAGIC_2) {
+        return;
+    }
+
+    payload_type_t type = data[3];
 
     switch (type) {
         case PAYLOAD_UNKNOWN:
             break;
 
         case PAYLOAD_ACTIVE_WINDOW:
-            handle_active_window_payload(data, length);
+            handle_active_window_payload(data + 4, length - 4);
             break;
+
         case PAYLOAD_VOLUME:
-            handle_volume_payload(data, length);
+            handle_volume_payload(data + 4, length - 4);
             break;
+
         default:
             break;
     }
 }
 
 static void handle_volume_payload(const uint8_t *data, uint8_t length) {
-    // Must have at least [type][1 byte of data]
-    if (length < 2) {
+    if (length == 0) {
         return;
     }
 
-    const char *payload = (const char *)&data[1];
+    char buf[5];
+    uint8_t copy_len = length;
 
-    int vol = atoi(payload);
+    if (copy_len >= sizeof(buf)) {
+        copy_len = sizeof(buf) - 1;
+    }
+
+    memcpy(buf, data, copy_len);
+    buf[copy_len] = '\0';
+
+    int vol = atoi(buf);
 
     // Validate range
     if (vol < 0 || vol > 100) {
@@ -171,23 +192,21 @@ static void handle_volume_payload(const uint8_t *data, uint8_t length) {
     }
 }
 
-
 static void handle_active_window_payload(
     const uint8_t *data,
     uint8_t length
 ) {
-    // Must have at least [type][1 byte of data]
-    if (length < 2) {
+    if (length == 0) {
         return;
     }
 
-    uint8_t copy_len = length - 1;
+    uint8_t copy_len = length;
 
     if (copy_len >= RAW_EPSIZE) {
         copy_len = RAW_EPSIZE - 1;
     }
 
-    memcpy(active_app, &data[1], copy_len);
+    memcpy(active_app, data, copy_len);
     active_app[copy_len] = '\0';
 
     uint8_t new_layer = app_name_to_layer(active_app);
@@ -195,7 +214,6 @@ static void handle_active_window_payload(
 
     last_app_update = timer_read32();
 }
-
 
 void switch_to_layer(uint8_t new_layer) {
     if (current_app_layer == new_layer) {

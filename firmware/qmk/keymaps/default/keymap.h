@@ -9,6 +9,10 @@
     #define RAW_EPSIZE   32
     #define APP_TIMEOUT 10000 // 10 seconds 
     #define VOLUME_DISPLAY_TIMEOUT 4000  // 4 seconds
+
+    #define HID_MAGIC_0 0x10
+    #define HID_MAGIC_1 0xFF
+    #define HID_MAGIC_2 0x5B
 #endif
 
 enum layers {
